@@ -1,0 +1,473 @@
+/**
+ * A Fita 13 — O Segredo Antes do Silêncio
+ * Folha de estilos do livro-jogo interativo.
+ *
+ * Organização:
+ *   :root           -> paleta de cores (tokens) e sombra padrão
+ *   base            -> reset leve, tipografia global, transições de tela
+ *   layout comum    -> página, barra de topo, botões
+ *   blocos de texto -> notas, falas sussurradas, faixa de pista
+ *   mapa (hub)      -> cartões de Início/Caminho no corcho de investigação
+ *   quebra-cabeças  -> peças clicáveis de cada desafio (palavras, faixas,
+ *                      sons, armários, depoimentos, fragmentos, tarjas)
+ *   diário de pistas-> painel lateral com as pistas já coletadas
+ *   finais          -> telas de encerramento
+ *
+ * Usado por index.html (via <link rel="stylesheet">).
+ */
+:root{
+    --ink:#17140f;
+    --ink-soft:#211c16;
+    --paper:#ddd0ac;
+    --paper-dim:#cabb90;
+    --paper-dark:#b7a578;
+    --paper-line:#a5946a;
+    --redacted:#0c0a08;
+    --stamp:#7a2118;
+    --stamp-dark:#4c140d;
+    --brass:#a9832f;
+    --brass-light:#cda956;
+    --fog:#4d5c53;
+    --ok:#51704f;
+    --err:#7a2118;
+    --shadow: 0 14px 28px rgba(0,0,0,.45);
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0;
+    background:var(--ink);
+    color:var(--paper);
+    font-family:'Lora', Georgia, serif;
+    line-height:1.7;
+    min-height:100vh;
+  }
+  button{font-family:inherit;}
+  h1,h2,h3,.label{font-family:'Special Elite', 'Courier New', monospace;}
+  #app{min-height:100vh; position:relative;}
+
+  .fade-in{animation:fadeSlide .5s ease both;}
+  @keyframes fadeSlide{from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);}}
+  @media (prefers-reduced-motion: reduce){
+    .fade-in{animation:none;}
+    *{animation-duration:.001s !important; transition-duration:.001s !important;}
+  }
+
+  /* ---------- shared layout ---------- */
+  .page{
+    max-width:640px;
+    margin:0 auto;
+    padding:2.4rem 1.4rem 6rem;
+  }
+  .topbar{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:1rem;
+    max-width:640px;
+    margin:0 auto;
+    padding:1.6rem 1.4rem .6rem;
+    border-bottom:1px solid rgba(169,131,47,.35);
+  }
+  .topbar .chapter{
+    font-size:.78rem;
+    letter-spacing:.06em;
+    color:var(--brass-light);
+    text-transform:uppercase;
+  }
+  .topbar .series{
+    font-size:.72rem;
+    color:rgba(221,208,172,.5);
+  }
+  .btn{
+    display:inline-block;
+    border:1px solid var(--brass);
+    background:transparent;
+    color:var(--paper);
+    padding:.7rem 1.3rem;
+    font-family:'Special Elite','Courier New',monospace;
+    font-size:.92rem;
+    letter-spacing:.02em;
+    cursor:pointer;
+    transition:background .2s ease, color .2s ease, transform .15s ease;
+  }
+  .btn:hover{background:rgba(169,131,47,.18);}
+  .btn:active{transform:translateY(1px);}
+  .btn:focus-visible{outline:2px solid var(--brass-light); outline-offset:3px;}
+  .btn-primary{
+    background:var(--brass);
+    color:var(--ink);
+    border-color:var(--brass);
+    font-weight:600;
+  }
+  .btn-primary:hover{background:var(--brass-light);}
+  .btn-row{display:flex; gap:.8rem; flex-wrap:wrap; margin-top:1.8rem;}
+  .btn-quiet{border-color:rgba(221,208,172,.35); color:rgba(221,208,172,.75); font-size:.8rem; padding:.5rem 1rem;}
+
+  p{margin:0 0 1.05em; max-width:62ch;}
+  .lead{font-style:italic; color:var(--brass-light);}
+  .small{font-size:.85rem; color:rgba(221,208,172,.65);}
+
+  /* ---------- cover ---------- */
+  .cover{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:3rem 1.4rem;
+    position:relative;
+    overflow:hidden;
+    background:
+      linear-gradient(180deg, rgba(23,20,15,.2), rgba(23,20,15,.92) 70%),
+      repeating-linear-gradient(100deg, rgba(221,208,172,.05) 0px, rgba(221,208,172,.05) 1px, transparent 1px, transparent 14px);
+    background-size:auto, 220% 220%;
+    animation:rainDrift 14s linear infinite;
+  }
+  @keyframes rainDrift{
+    from{background-position:0 0, 0% 0%;}
+    to{background-position:0 0, 0% 100%;}
+  }
+  .cover-stamp{
+    font-family:'Special Elite', monospace;
+    font-size:.7rem;
+    letter-spacing:.18em;
+    color:var(--stamp);
+    border:2px solid var(--stamp);
+    padding:.35rem .7rem;
+    transform:rotate(-7deg);
+    margin-bottom:2rem;
+    opacity:.85;
+  }
+  .cover h1{
+    font-size:clamp(2.1rem, 7vw, 3.2rem);
+    letter-spacing:.03em;
+    margin:0 0 .5rem;
+    color:var(--paper);
+  }
+  .cover .subtitle{
+    font-style:italic;
+    color:var(--brass-light);
+    font-size:1.1rem;
+    margin:0 0 1.6rem;
+  }
+  .cover .setting{
+    font-size:.82rem;
+    letter-spacing:.05em;
+    color:rgba(221,208,172,.55);
+    margin-bottom:2.6rem;
+  }
+  .cover .endings-note{
+    margin-top:1.6rem;
+    font-size:.78rem;
+    color:rgba(221,208,172,.5);
+  }
+
+  /* ---------- dossier text blocks ---------- */
+  .note{
+    background:rgba(169,131,47,.08);
+    border-left:3px solid var(--brass);
+    padding:.9rem 1.1rem;
+    margin:1.5rem 0;
+    font-size:.95rem;
+  }
+  .whisper{
+    font-style:italic;
+    color:var(--brass-light);
+    border-left:2px solid var(--brass);
+    padding-left:1rem;
+    margin:1.4rem 0;
+  }
+  .clue-banner{
+    margin-top:1.8rem;
+    padding:1rem 1.1rem;
+    background:var(--redacted);
+    border:1px solid rgba(169,131,47,.4);
+    display:flex;
+    gap:.8rem;
+    align-items:flex-start;
+  }
+  .clue-banner .tag{
+    font-family:'Special Elite',monospace;
+    font-size:.68rem;
+    letter-spacing:.1em;
+    color:var(--stamp);
+    white-space:nowrap;
+    padding-top:.15rem;
+  }
+  .clue-banner p{margin:0; font-size:.92rem; color:var(--paper);}
+
+  /* ---------- board (hub) ---------- */
+  .board-instructions{color:rgba(221,208,172,.85);}
+  .board-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:1.1rem;
+    margin:1.8rem 0 1.4rem;
+  }
+  @media (max-width:620px){ .board-grid{grid-template-columns:1fr;} }
+  .file-card{
+    background:var(--paper);
+    color:var(--ink);
+    border:none;
+    text-align:left;
+    padding:1.1rem .95rem 1rem;
+    cursor:pointer;
+    font-family:'Lora',serif;
+    box-shadow:var(--shadow);
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    gap:.4rem;
+    min-height:132px;
+    clip-path:polygon(0 0,96% 0,100% 8%,100% 100%,4% 100%,0 92%);
+  }
+  .file-card:nth-child(1){transform:rotate(-1.4deg);}
+  .file-card:nth-child(2){transform:rotate(0.8deg);}
+  .file-card:nth-child(3){transform:rotate(-0.5deg);}
+  .file-card:hover{transform:rotate(0deg) translateY(-3px);}
+  .file-card:focus-visible{outline:2px solid var(--brass-light); outline-offset:3px;}
+  .file-card-num{
+    font-family:'Special Elite',monospace;
+    font-size:.68rem;
+    letter-spacing:.08em;
+    color:var(--stamp);
+  }
+  .file-card-icon{font-size:1.5rem;}
+  .file-card-title{font-weight:600; font-size:.98rem; line-height:1.3;}
+  .file-card-check{
+    margin-top:.2rem;
+    font-family:'Special Elite',monospace;
+    font-size:.66rem;
+    letter-spacing:.06em;
+    color:var(--ok);
+  }
+  .file-card.is-done{background:var(--paper-dim);}
+  .board-hint{color:rgba(221,208,172,.55); font-size:.88rem;}
+
+  /* ---------- puzzle widgets ---------- */
+  .puzzle-block{
+    margin:1.6rem 0;
+    padding:1.3rem 1.2rem;
+    background:rgba(221,208,172,.04);
+    border:1px dashed rgba(169,131,47,.45);
+  }
+  .puzzle-instructions{font-size:.92rem; color:rgba(221,208,172,.8); margin-bottom:1rem;}
+  .tiles{display:flex; flex-wrap:wrap; gap:.6rem;}
+  .tile{
+    background:var(--paper-dim);
+    color:var(--ink);
+    border:none;
+    border-bottom:3px solid var(--brass);
+    padding:.55rem .9rem;
+    font-family:'Special Elite',monospace;
+    font-size:.82rem;
+    letter-spacing:.04em;
+    cursor:pointer;
+    transition:transform .12s ease, background .15s ease;
+  }
+  .tile:hover{transform:translateY(-2px);}
+  .tile:focus-visible{outline:2px solid var(--brass-light); outline-offset:2px;}
+  .tile.chosen{background:var(--brass); border-bottom-color:var(--ink); color:var(--ink);}
+  .tile.wrong{animation:shake .35s ease;}
+  .tile:disabled{opacity:.4; cursor:default;}
+  @keyframes shake{
+    0%,100%{transform:translateX(0);}
+    25%{transform:translateX(-5px);}
+    75%{transform:translateX(5px);}
+  }
+  .sequence-track{display:flex; gap:.5rem; margin-bottom:1rem; flex-wrap:wrap; min-height:2.2rem;}
+  .sequence-slot{
+    border:1px solid rgba(169,131,47,.5);
+    padding:.4rem .7rem;
+    font-family:'Special Elite',monospace;
+    font-size:.78rem;
+    color:rgba(221,208,172,.4);
+  }
+  .sequence-slot.filled{color:var(--paper); border-color:var(--brass);}
+
+  .track-list{display:flex; flex-direction:column; gap:.5rem;}
+  .track-row{
+    display:flex;
+    align-items:center;
+    gap:.8rem;
+    background:rgba(221,208,172,.05);
+    border:1px solid rgba(169,131,47,.25);
+    padding:.6rem .8rem;
+    cursor:pointer;
+    color:var(--paper);
+    text-align:left;
+    width:100%;
+    font-family:'Lora',serif;
+    font-size:.92rem;
+  }
+  .track-row:hover{background:rgba(169,131,47,.12);}
+  .track-row.chosen{background:rgba(81,112,79,.25); border-color:var(--ok);}
+  .track-row.wrong{animation:shake .35s ease;}
+  .track-row .num{
+    font-family:'Special Elite',monospace;
+    color:var(--brass-light);
+    width:1.6rem;
+    flex-shrink:0;
+  }
+  .track-row .anno{display:block; font-size:.78rem; font-style:italic; color:rgba(221,208,172,.5); margin-top:.15rem;}
+
+  .sound-grid{display:flex; gap:.8rem; flex-wrap:wrap;}
+  .sound-btn{
+    flex:1 1 140px;
+    background:var(--paper-dim);
+    color:var(--ink);
+    border:none;
+    padding:1.1rem .8rem;
+    text-align:center;
+    cursor:pointer;
+    font-family:'Special Elite',monospace;
+    font-size:.85rem;
+  }
+  .sound-btn .emoji{font-size:1.6rem; display:block; margin-bottom:.4rem;}
+  .sound-btn:hover{transform:translateY(-2px);}
+  .sound-btn.wrong{animation:shake .35s ease;}
+
+  .locker-grid{display:grid; grid-template-columns:repeat(6,1fr); gap:.5rem; max-width:360px;}
+  .locker-btn{
+    aspect-ratio:1;
+    background:var(--paper-dim);
+    color:var(--ink);
+    border:none;
+    font-family:'Special Elite',monospace;
+    font-size:1.05rem;
+    cursor:pointer;
+  }
+  .locker-btn:hover{background:var(--brass-light);}
+  .locker-btn.wrong{animation:shake .35s ease;}
+
+  .testimony-grid{display:flex; flex-direction:column; gap:.8rem;}
+  .testimony-card{
+    background:var(--paper-dim);
+    color:var(--ink);
+    border:none;
+    text-align:left;
+    padding:1rem 1.1rem;
+    cursor:pointer;
+    font-family:'Lora',serif;
+  }
+  .testimony-card:hover{background:var(--brass-light);}
+  .testimony-card.wrong{animation:shake .35s ease;}
+  .testimony-who{font-family:'Special Elite',monospace; font-size:.72rem; letter-spacing:.06em; color:var(--stamp); display:block; margin-bottom:.35rem;}
+  .testimony-quote{font-style:italic; margin:0 0 .4rem;}
+  .testimony-time{font-size:.78rem; color:#3d372a;}
+  .log-strip{
+    font-family:'Special Elite',monospace;
+    font-size:.78rem;
+    color:var(--brass-light);
+    background:var(--redacted);
+    border:1px solid rgba(169,131,47,.4);
+    padding:.6rem .9rem;
+    margin-bottom:1rem;
+  }
+
+  .redaction-grid{display:flex; flex-wrap:wrap; gap:.5rem .5rem; align-items:center; line-height:2.4;}
+  .doc-word{color:rgba(221,208,172,.4); font-size:.92rem;}
+  .redaction-bar{
+    background:var(--redacted);
+    border:none;
+    color:transparent;
+    padding:.25rem .7rem;
+    cursor:pointer;
+    font-family:'Lora',serif;
+    font-size:.92rem;
+    min-width:2.4rem;
+    transition:background .2s ease, color .2s ease;
+  }
+  .redaction-bar:hover{background:#221d16;}
+  .redaction-bar.revealed{background:transparent; color:var(--paper); border-bottom:1px solid var(--brass); cursor:default; padding:.25rem .1rem;}
+  .redaction-progress{font-size:.8rem; color:rgba(221,208,172,.5); margin-top:1rem;}
+
+  .choice-row{display:flex; gap:.8rem; flex-wrap:wrap; margin-top:1rem;}
+  .choice-btn{
+    flex:1 1 200px;
+    background:transparent;
+    border:1px solid var(--brass);
+    color:var(--paper);
+    padding:.9rem 1rem;
+    cursor:pointer;
+    font-family:'Special Elite',monospace;
+    font-size:.85rem;
+  }
+  .choice-btn:hover{background:rgba(169,131,47,.18);}
+
+  .feedback{font-size:.85rem; color:var(--stamp); min-height:1.2em; margin-top:.6rem;}
+
+  /* ---------- journal ---------- */
+  .journal-toggle{
+    position:fixed;
+    right:1rem;
+    bottom:1rem;
+    z-index:40;
+    background:var(--brass);
+    color:var(--ink);
+    border:none;
+    padding:.7rem 1rem;
+    font-family:'Special Elite',monospace;
+    font-size:.78rem;
+    letter-spacing:.03em;
+    cursor:pointer;
+    box-shadow:var(--shadow);
+  }
+  .journal-toggle:hover{background:var(--brass-light);}
+  .journal-panel{
+    position:fixed;
+    inset:0;
+    background:rgba(12,10,8,.72);
+    z-index:50;
+    display:flex;
+    justify-content:flex-end;
+  }
+  .journal-inner{
+    width:min(360px, 92vw);
+    height:100%;
+    background:var(--ink-soft);
+    border-left:1px solid rgba(169,131,47,.4);
+    padding:1.6rem 1.3rem;
+    overflow-y:auto;
+    animation:slideIn .25s ease both;
+  }
+  @keyframes slideIn{from{transform:translateX(24px); opacity:0;} to{transform:translateX(0); opacity:1;}}
+  .journal-inner h2{font-size:1.05rem; margin:0 0 .3rem; color:var(--brass-light);}
+  .journal-inner .small{margin-bottom:1.2rem;}
+  .journal-item{
+    border-left:2px solid var(--brass);
+    padding:.5rem .8rem;
+    margin-bottom:.8rem;
+    font-size:.88rem;
+    color:var(--paper);
+  }
+  .journal-empty{color:rgba(221,208,172,.5); font-size:.88rem;}
+  .journal-close{margin-top:1rem;}
+
+  /* ---------- endings ---------- */
+  .ending-tag{
+    font-family:'Special Elite',monospace;
+    font-size:.72rem;
+    letter-spacing:.1em;
+    color:var(--stamp);
+    border:1px solid var(--stamp);
+    display:inline-block;
+    padding:.25rem .6rem;
+    margin-bottom:1.2rem;
+  }
+  .ending-close{
+    font-style:italic;
+    color:var(--brass-light);
+    margin-top:1.6rem;
+    border-top:1px solid rgba(169,131,47,.3);
+    padding-top:1.2rem;
+  }
+  .ending-tracker{
+    margin-top:2.2rem;
+    padding-top:1.2rem;
+    border-top:1px dashed rgba(169,131,47,.3);
+    font-size:.85rem;
+    color:rgba(221,208,172,.6);
+  }
